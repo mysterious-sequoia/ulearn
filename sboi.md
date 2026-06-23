@@ -10,6 +10,7 @@ classDiagram
 
     class Failure {
         +FailureType Type
+        +DateTime Date
         +Failure(FailureType type)
         +Failure(int failureCode)
         +IsSerious() bool
@@ -23,7 +24,7 @@ classDiagram
 
     class ReportMaker {
         +FindDevicesFailedBeforeDateObsolete(int day, int month, int year, int[] failureTypes, int[] deviceId, object[][] times, List devices)$ List~string~
-        +FindDevicesFailedBeforeDate(DateTime date, Failure[] failures, DateTime[] failureDates, Device[] failedDevices)$ List~Device~
+        +FindDevicesFailedBeforeDate(DateTime date, Failure[] failures, Device[] failedDevices)$ Device[]
     }
 
     Failure --> FailureType : содержит
