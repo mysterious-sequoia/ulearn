@@ -1,18 +1,22 @@
 ```mermaid
 classDiagram
     namespace Builder {
-        class DotGraphBuilder {
-            #Graph graph
-            #DotGraphBuilder(Graph graph)
-            +DirectedGraph(string name)$ DotGraphBuilder
-            +UndirectedGraph(string name)$ DotGraphBuilder
+        class GraphBuilderHandle {
+            <<abstract>>
+            -Graph graph
+            #GraphBuilderHandle(Graph graph)
             +AddNode(string name) NodeBuilder
             +AddEdge(string from, string to) EdgeBuilder
             +Build() string
         }
 
+        class DotGraphBuilder {
+            +DirectedGraph(string name)$ DotGraphBuilder
+            +UndirectedGraph(string name)$ DotGraphBuilder
+        }
+
         class NodeBuilder {
-            -GraphNode node
+            -GraphNode _node
             ~NodeBuilder(Graph graph, GraphNode node)
             +With(Action~NodeConfigurator~ configure) DotGraphBuilder
         }
@@ -48,7 +52,7 @@ classDiagram
         }
     }
 
-    namespace Graphs {
+    namespace Provided {
         class Graph {
             -List~GraphEdge~ edges
             -Dictionary~string,GraphNode~ nodes
@@ -75,11 +79,27 @@ classDiagram
             +bool Directed
             +GraphEdge(string sourceNode, string destinationNode, bool directed)
         }
+
+        class DotFormatExtensions {
+            <<static>>
+            +ToDotFormat(Graph this)$ string
+        }
+
+        class DotFormatWriter {
+            -TextWriter writer
+            +DotFormatWriter(TextWriter writer)
+            +Write(Graph graph)
+            +Write(GraphNode node)
+            +Write(GraphEdge edge)
+            +WriteAttributes(IReadOnlyDictionary attributes)
+            +EscapeId(string id)$ string
+        }
     }
 
-    DotGraphBuilder <|-- NodeBuilder : наследует
-    DotGraphBuilder <|-- EdgeBuilder : наследует
-    DotGraphBuilder <-- Graph : строит
+    GraphBuilderHandle <|-- DotGraphBuilder : наследует
+    GraphBuilderHandle <|-- NodeBuilder : наследует
+    GraphBuilderHandle <|-- EdgeBuilder : наследует
+    GraphBuilderHandle <-- Graph : строит
     NodeBuilder <-- GraphNode : содержит
     EdgeBuilder <-- GraphEdge : содержит
     NodeConfigurator <-- GraphNode : конфигурирует
@@ -87,8 +107,10 @@ classDiagram
     Graph <-- GraphNode : содержит
     Graph <-- GraphEdge : содержит
     NodeConfigurator ..> NodeShape : использует (принимает)
-    DotGraphBuilder ..> NodeBuilder : возвращает (chaining)
-    DotGraphBuilder ..> EdgeBuilder : возвращает (chaining)
-    EdgeBuilder ..> NodeBuilder : возвращает (chaining)
-    NodeBuilder ..> EdgeBuilder : возвращает (chaining)
+    GraphBuilderHandle ..> EdgeBuilder : возвращает (chaining)
+    GraphBuilderHandle ..> NodeBuilder : возвращает (chaining)
+    DotFormatExtensions ..> DotFormatWriter : использует для форматирования
+    DotGraphBuilder ..> DotFormatExtensions : форматирует граф
+    NodeBuilder ..> NodeConfigurator : передает в лямбду
+    EdgeBuilder ..> EdgeConfigurator : передает в лямбду
 ```
