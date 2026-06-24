@@ -79,12 +79,16 @@ classDiagram
 
     DotGraphBuilder <|-- NodeBuilder : наследует
     DotGraphBuilder <|-- EdgeBuilder : наследует
-    DotGraphBuilder *-- Graph : содержит
-    NodeBuilder *-- GraphNode : содержит
-    EdgeBuilder *-- GraphEdge : содержит
-    NodeConfigurator *-- GraphNode : конфигурирует
-    EdgeConfigurator *-- GraphEdge : конфигурирует
-    Graph *-- GraphNode : содержит
-    Graph *-- GraphEdge : содержит
-    NodeConfigurator --> NodeShape : использует (принимает)
+    DotGraphBuilder <-- Graph : строит
+    NodeBuilder <-- GraphNode : содержит
+    EdgeBuilder <-- GraphEdge : содержит
+    NodeConfigurator <-- GraphNode : конфигурирует
+    EdgeConfigurator <-- GraphEdge : конфигурирует
+    Graph <-- GraphNode : содержит
+    Graph <-- GraphEdge : содержит
+    NodeConfigurator ..> NodeShape : использует (принимает)
+    DotGraphBuilder ..> NodeBuilder : возвращает (chaining)
+    DotGraphBuilder ..> EdgeBuilder : возвращает (chaining)
+    EdgeBuilder ..> NodeBuilder : возвращает (chaining)
+    NodeBuilder ..> EdgeBuilder : возвращает (chaining)
 ```
